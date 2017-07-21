@@ -35,7 +35,6 @@ import it.octavianionel.intentserviceretrofitexample.services.DownloadService;
 
 public class CategoriesFragment extends GeneralFragment implements DownloadResultReceiver.Receiver {
 
-    private NetworkManager mNetworkManager;
     private RecyclerView mRecyclerView;
     private ProgressBar mProgressBar;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -59,9 +58,7 @@ public class CategoriesFragment extends GeneralFragment implements DownloadResul
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mActivity = getActivity();
-        mNetworkManager = new NetworkManager(mActivity);
         mCategoriesAdapter = new CategoriesAdapter(mActivity, mPostList);
-//        mNetworkManager.obtainCategoryPosts("dev", "android");
                 /* Starting Download Service */
         mReceiver = new DownloadResultReceiver(new Handler());
         mReceiver.setReceiver(this);
@@ -97,6 +94,7 @@ public class CategoriesFragment extends GeneralFragment implements DownloadResul
     public void onReceiveResult(int resultCode, Bundle resultData) {
         switch (resultCode) {
             case DownloadService.STATUS_RUNNING:
+                /*show the progress*/
                 mProgressBar.setIndeterminate(true);
                 break;
             case DownloadService.STATUS_FINISHED:
@@ -117,24 +115,4 @@ public class CategoriesFragment extends GeneralFragment implements DownloadResul
         }
     }
 
-//    @Override
-//    public void onStart() {
-//        super.onStart();
-//        EventBus.getDefault().register(this);
-//    }
-//
-//    @Override
-//    public void onStop() {
-//        super.onStop();
-//        EventBus.getDefault().unregister(this);
-//    }
-
-//    @Subscribe(threadMode = ThreadMode.MAIN)
-//    public void onEvent(Events.EventCategories event) {
-//        mPostList.clear();
-//        mPostList.addAll(event.getmPostList());
-//        mProgressBar.setIndeterminate(false);
-//        mProgressBar.setVisibility(View.GONE);
-//        mCategoriesAdapter.notifyDataSetChanged();
-//    }
 }
