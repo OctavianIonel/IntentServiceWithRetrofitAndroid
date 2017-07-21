@@ -2,7 +2,7 @@
 This Android application shows an example of a fragment which is lunching an IntentService which will later download data from an API. Afterwards, the calling fragment is informed to update the UI using a ResultReceiver.
 There is also a branch "Skeletron_Fragment_EventBus" which make use of EventBus, but in case we need to save the data to a SQLite it is better to do this work from the IntentService.
 
-
+![alternate text](https://github.com/OctavianIonel/IntentServiceWithRetrofitAndroid/blob/master/intent_service_retrofit.gif)
 
 In order to test this project, all you have to do is to clone it.
 
