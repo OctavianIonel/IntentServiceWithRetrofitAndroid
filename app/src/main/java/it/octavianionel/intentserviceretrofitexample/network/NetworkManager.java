@@ -33,6 +33,10 @@ public class NetworkManager {
         mApiService = retrofit.create(APIService.class);
     }
 
+    public APIService getmApiService() {
+        return mApiService;
+    }
+
     public void obtainCategoryPosts(String dev, String slug) {
         mApiService.getCategoryPostsAPI(dev, slug).enqueue(new Callback<CategoryPostsResponse>() {
             @Override

@@ -1,6 +1,9 @@
 package it.octavianionel.intentserviceretrofitexample.model;
 
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -10,7 +13,7 @@ import java.util.List;
  * Created by octavian on 7/19/17.
  */
 
-public class Post {
+public class Post implements Parcelable {
 
     @SerializedName("id")
     @Expose
@@ -78,6 +81,8 @@ public class Post {
     @SerializedName("thumbnail_images")
     @Expose
     private ThumbnailImages thumbnailImages;
+
+
 
     public Integer getId() {
         return id;
@@ -255,4 +260,54 @@ public class Post {
         this.thumbnailImages = thumbnailImages;
     }
 
+    protected Post(Parcel in) {
+        type = in.readString();
+        slug = in.readString();
+        url = in.readString();
+        status = in.readString();
+        title = in.readString();
+        titlePlain = in.readString();
+        content = in.readString();
+        excerpt = in.readString();
+        date = in.readString();
+        modified = in.readString();
+        commentStatus = in.readString();
+        thumbnail = in.readString();
+        thumbnailSize = in.readString();
+    }
+
+    public static final Creator<Post> CREATOR = new Creator<Post>() {
+        @Override
+        public Post createFromParcel(Parcel in) {
+            return new Post(in);
+        }
+
+        @Override
+        public Post[] newArray(int size) {
+            return new Post[size];
+        }
+    };
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(type);
+        dest.writeString(slug);
+        dest.writeString(url);
+        dest.writeString(status);
+        dest.writeString(title);
+        dest.writeString(titlePlain);
+        dest.writeString(content);
+        dest.writeString(excerpt);
+        dest.writeString(date);
+        dest.writeString(modified);
+        dest.writeString(commentStatus);
+        dest.writeString(thumbnail);
+        dest.writeString(thumbnailSize);
+    }
 }

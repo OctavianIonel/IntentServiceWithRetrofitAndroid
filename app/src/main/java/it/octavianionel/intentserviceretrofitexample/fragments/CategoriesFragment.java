@@ -1,7 +1,10 @@
 package it.octavianionel.intentserviceretrofitexample.fragments;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -9,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -22,12 +26,14 @@ import it.octavianionel.intentserviceretrofitexample.activities.CategoriesAdapte
 import it.octavianionel.intentserviceretrofitexample.model.Post;
 import it.octavianionel.intentserviceretrofitexample.model.eventbusmodel.Events;
 import it.octavianionel.intentserviceretrofitexample.network.NetworkManager;
+import it.octavianionel.intentserviceretrofitexample.services.DownloadResultReceiver;
+import it.octavianionel.intentserviceretrofitexample.services.DownloadService;
 
 /**
  * Created by octavian on 7/19/17.
  */
 
-public class CategoriesFragment extends GeneralFragment {
+public class CategoriesFragment extends GeneralFragment implements DownloadResultReceiver.Receiver {
 
     private NetworkManager mNetworkManager;
     private RecyclerView mRecyclerView;
@@ -36,6 +42,11 @@ public class CategoriesFragment extends GeneralFragment {
     private CategoriesAdapter mCategoriesAdapter;
     private List<Post> mPostList = new ArrayList<>();
     private Activity mActivity;
+
+    private DownloadResultReceiver mReceiver;
+
+    private String dev = "dev";
+    private String slug = "android";
 
     public static CategoriesFragment newInstance() {
         Bundle args = new Bundle();
@@ -50,7 +61,18 @@ public class CategoriesFragment extends GeneralFragment {
         mActivity = getActivity();
         mNetworkManager = new NetworkManager(mActivity);
         mCategoriesAdapter = new CategoriesAdapter(mActivity, mPostList);
-        mNetworkManager.obtainCategoryPosts("dev", "android");
+//        mNetworkManager.obtainCategoryPosts("dev", "android");
+                /* Starting Download Service */
+        mReceiver = new DownloadResultReceiver(new Handler());
+        mReceiver.setReceiver(this);
+        Intent intent = new Intent(Intent.ACTION_SYNC, null, mActivity, DownloadService.class);
+
+        /* Send optional extras to Download IntentService */
+        intent.putExtra("dev", dev);
+        intent.putExtra("slug", slug);
+        intent.putExtra("receiver", mReceiver);
+
+        mActivity.startService(intent);
     }
 
     @Nullable
@@ -72,23 +94,47 @@ public class CategoriesFragment extends GeneralFragment {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        EventBus.getDefault().register(this);
+    public void onReceiveResult(int resultCode, Bundle resultData) {
+        switch (resultCode) {
+            case DownloadService.STATUS_RUNNING:
+                mProgressBar.setIndeterminate(true);
+                break;
+            case DownloadService.STATUS_FINISHED:
+                /* Hide progress & extract result from bundle */
+                mPostList.clear();
+                mProgressBar.setIndeterminate(false);
+                mProgressBar.setVisibility(View.GONE);
+                mPostList = (ArrayList)resultData.getParcelableArrayList("postList");
+                mCategoriesAdapter = new CategoriesAdapter(mActivity, mPostList);
+                mRecyclerView.setAdapter(mCategoriesAdapter);
+                mCategoriesAdapter.notifyDataSetChanged();
+                break;
+            case DownloadService.STATUS_ERROR:
+                /* Handle the error */
+                String error = resultData.getString(Intent.EXTRA_TEXT);
+                Toast.makeText(mActivity, error, Toast.LENGTH_LONG).show();
+                break;
+        }
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        EventBus.getDefault().unregister(this);
-    }
+//    @Override
+//    public void onStart() {
+//        super.onStart();
+//        EventBus.getDefault().register(this);
+//    }
+//
+//    @Override
+//    public void onStop() {
+//        super.onStop();
+//        EventBus.getDefault().unregister(this);
+//    }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(Events.EventCategories event) {
-        mPostList.clear();
-        mPostList.addAll(event.getmPostList());
-        mProgressBar.setIndeterminate(false);
-        mProgressBar.setVisibility(View.GONE);
-        mCategoriesAdapter.notifyDataSetChanged();
-    }
+//    @Subscribe(threadMode = ThreadMode.MAIN)
+//    public void onEvent(Events.EventCategories event) {
+//        mPostList.clear();
+//        mPostList.addAll(event.getmPostList());
+//        mProgressBar.setIndeterminate(false);
+//        mProgressBar.setVisibility(View.GONE);
+//        mCategoriesAdapter.notifyDataSetChanged();
+//    }
 }
