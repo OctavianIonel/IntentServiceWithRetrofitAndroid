@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,18 +13,12 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import it.octavianionel.intentserviceretrofitexample.R;
-import it.octavianionel.intentserviceretrofitexample.activities.CategoriesAdapter;
+import it.octavianionel.intentserviceretrofitexample.adapters.CategoriesAdapter;
 import it.octavianionel.intentserviceretrofitexample.model.Post;
-import it.octavianionel.intentserviceretrofitexample.model.eventbusmodel.Events;
-import it.octavianionel.intentserviceretrofitexample.network.NetworkManager;
 import it.octavianionel.intentserviceretrofitexample.services.DownloadResultReceiver;
 import it.octavianionel.intentserviceretrofitexample.services.DownloadService;
 
